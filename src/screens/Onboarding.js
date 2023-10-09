@@ -9,7 +9,7 @@ import { Easing } from "react-native-reanimated";
 const Onboarding = ({ navigation }) => {
   React.useEffect(() => {
     let timer = setTimeout(() => {
-      navigation.replace("Home");
+      navigation.replace("BottomNav");
     }, 3000);
     return () => clearTimeout(timer);
   }, []);
