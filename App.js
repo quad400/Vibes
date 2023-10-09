@@ -1,20 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-reanimated'
+import 'react-native-gesture-handler'
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import MainNavigation from "./src/navigations/MainNavigation";
+import * as Font from "expo-font";
+import { StatusBar } from "expo-status-bar";
 
-export default function App() {
+const App = () => {
+  const [fontLoaded] = Font.useFonts({
+    KarlaBold: require("./assets/fonts/Karla-Bold.ttf"),
+    KarlaMedium: require("./assets/fonts/Karla-Medium.ttf"),
+    KarlaRegular: require("./assets/fonts/Karla-Regular.ttf"),
+    KarlaSemiBold: require("./assets/fonts/Karla-SemiBold.ttf"),
+    KarlaLight: require("./assets/fonts/Karla-Light.ttf"),
+  });
+
+  if (!fontLoaded) return null;
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+    <StatusBar style="light" />
+    <NavigationContainer>
+      <MainNavigation />
+    </NavigationContainer>
+    </>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
