@@ -10,7 +10,7 @@ import BottomNav from "./BottomNav";
 const Stack = createNativeStackNavigator();
 
 const MainNavigation = () => {
-  const { setTracks } = useContext(TracksContext);
+  // const { setTracks } = useContext(TracksContext);
 
   const getAudioFiles = async () => {
     
@@ -22,7 +22,7 @@ const MainNavigation = () => {
         first: media.totalCount
       })
 
-      setTracks(media.assets);
+      // setTracks(media.assets);
    
   };
 

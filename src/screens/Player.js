@@ -5,59 +5,50 @@ import { BlurView } from "expo-blur";
 import { COLORS, FONTS } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import { useSelector } from "react-redux";
+import { BottomModal } from "react-native-modals";
 
 const Player = () => {
-  const { statusObj, setStatusObj, player } = useContext(TracksContext);
+  const { track } = useSelector((state) => state.music);
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState();
+  const [modalVisible, setModalVisible] = useState(false);
 
 
-  useEffect(()=> {
-    playMusic()
-  },[player])
+  useEffect(() => {
+    playMusic();
+  }, [track]);
 
   React.useEffect(() => {
     return sound
       ? () => {
-          console.log("Unloading Sound");
           sound.unloadAsync();
         }
       : undefined;
   }, [sound]);
 
   const playMusic = async () => {
-    console.log("first play");
-    if (!player?.uri) {
+    if (!track?.preview_url) {
       return;
     }
     const { sound: newSound } = await Audio.Sound.createAsync({
-      uri: player.uri,
+      uri: track.preview_url,
     });
     setSound(newSound);
 
-    if (sound) {
-      await sound.unloadAsync();
-    }
-    await newSound.playAsync();
     newSound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
-
-    if (statusObj === null) return;
-
+    await newSound.playAsync();
   };
-  if (!player) {
-    return null;
-  
+
+  if (track === null) {
+    return;
   }
-    const pauseMusic = async () => {
-    
-    // handle pause music
+  const playPauseMusic = async () => {
     if (!sound) return;
-    
+
     if (isPlaying) {
-      console.log("pause")
       await sound.pauseAsync();
     } else {
-      console.log("play")
       await sound.playAsync();
     }
   };
@@ -65,76 +56,94 @@ const Player = () => {
   const onPlaybackStatusUpdate = (status) => {
     if (!status.isLoaded) return;
     setIsPlaying(status.isPlaying);
-    setStatusObj(status);
   };
 
   return (
-    <BlurView
-      intensity={30}
-      tint="dark"
-      style={{
-        backgroundColor: "transparent",
-        position: "absolute",
-        bottom: 70,
-        height: 40,
-        width: "100%",
-      }}
-    >
-      <View
+    <>
+      <BlurView
+        intensity={30}
+        tint="dark"
         style={{
-          height: 50,
-          backgroundColor: COLORS.primaryDark,
-          elevation: 2,
-          flexDirection: "row",
-          alignItems: "center",
-          marginBottom: 10,
-          padding: 10,
+          backgroundColor: "transparent",
+          position: "absolute",
+          bottom: 70,
+          height: 40,
+          width: "100%",
         }}
       >
         <View
           style={{
-            height: 40,
-            width: 40,
-            justifyContent: "center",
+            height: 50,
+            backgroundColor: COLORS.primaryDark,
+            elevation: 2,
+            flexDirection: "row",
             alignItems: "center",
-            borderRadius: 5,
-            marginRight: 20,
-            backgroundColor: COLORS.light,
+            marginBottom: 10,
+            padding: 10,
           }}
         >
-          <Image
-            source={require("../../assets/sound.png")}
-            resizeMode="contain"
+          <View
             style={{
-              tintColor: COLORS.primary,
-              height: 24,
-              width: 24,
-            }}
-          />
-        </View>
-        <View
-          style={{
-            width: "70%",
-          }}
-        >
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            style={{
-              marginRight: 10,
-              fontSize: 12,
-              color: COLORS.light,
-              ...FONTS.Regular,
+              height: 40,
+              width: 40,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 5,
+              marginRight: 20,
+              backgroundColor: COLORS.light,
             }}
           >
-            {player?.filename.split(".")[0]}
-          </Text>
+            <Image
+              source={{ uri: track?.album?.images[0].url }}
+              style={{
+                height: 50,
+                width: 50,
+                borderRadius: 15,
+              }}
+            />
+          </View>
+          <View
+            style={{
+              width: "70%",
+            }}
+          >
+            <Text
+              numberOfLines={1}
+              style={{
+                marginRight: 10,
+                fontSize: 14,
+                color: COLORS.light,
+                ...FONTS.Regular,
+              }}
+            >
+              {track?.name}
+            </Text>
+
+            <Text
+              style={{
+                marginRight: 10,
+                fontSize: 12,
+                color: "gray",
+                ...FONTS.Regular,
+              }}
+            >
+              {track?.artists[0].name}
+            </Text>
+          </View>
+
+          <TouchableOpacity onPress={() => playPauseMusic()}>
+            <Ionicons
+              name={isPlaying ? "pause" : "play"}
+              size={24}
+              color={COLORS.light}
+            />
+          </TouchableOpacity>
         </View>
-        <View>
-            <Ionicons onPress={pauseMusic} name={isPlaying ? "pause" : "play"} size={24} color={COLORS.light} />
-        </View>
-      </View>
-    </BlurView>
+      </BlurView>
+      <BottomModal visible >
+
+      </BottomModal>
+    </>
   );
 };
 

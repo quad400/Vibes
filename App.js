@@ -1,14 +1,19 @@
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 import * as React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import MainNavigation from "./src/navigations/MainNavigation";
 import * as Font from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import { StyleSheet, Text, View } from "react-native";
+import MainNavigation from "./src/navigations/MainNavigation";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Provider } from "react-redux";
+import { store } from "./src/context/store";
 import { StatusBar } from "expo-status-bar";
-import TrackProvider from "./src/TrackContext";
-import * as SplashScreen from "expo-splash-screen"
 
-SplashScreen.hideAsync()
+SplashScreen.hideAsync();
+
+const Stack = createNativeStackNavigator()
 
 const App = () => {
   const [fontLoaded] = Font.useFonts({
@@ -23,14 +28,22 @@ const App = () => {
 
   return (
     <>
-      <StatusBar style="light" />
+    <StatusBar style="light" />
+    <Provider store={store}>
       <NavigationContainer>
-        <TrackProvider>
-          <MainNavigation />
-        </TrackProvider>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainNavigation" component={MainNavigation} />
+        </Stack.Navigator>
       </NavigationContainer>
+    </Provider>
     </>
   );
 };
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
